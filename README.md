@@ -13,7 +13,7 @@ A simple and type-safe environment variable validator for Node.js applications.
 ## Installation
 
 ```bash
-npm install envfy
+npm install @yasserfedsi/envfy
 ```
 
 ## Why envfy?
@@ -26,7 +26,7 @@ Environment variables are always strings and error-prone.
 
 ## Usage
 ```ts
-import { validateEnv } from "envfy";
+import { validateEnv } from "@yasserfedsi/envfy";
 
 const env = validateEnv({
   PORT: "number",
