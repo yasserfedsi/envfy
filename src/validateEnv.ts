@@ -1,8 +1,15 @@
-import { parseBoolean, parseNumber, parseString } from "./validators";
+import {
+  parseBoolean,
+  parseNumber,
+  parseString,
+  parseEnum,
+} from "./validators";
 
 export type PrimitiveType = "string" | "number" | "boolean";
 
-export type Schema = Record<string, PrimitiveType>;
+export type EnumType = readonly string[];
+
+export type Schema = Record<string, PrimitiveType | EnumType>;
 
 export function validateEnv(schema: Schema) {
   const result: Record<string, unknown> = {};
@@ -14,6 +21,11 @@ export function validateEnv(schema: Schema) {
 
     if (value === undefined) {
       throw new Error(`Missing environment variable: ${key}`);
+    }
+
+    if (Array.isArray(rule)) {
+      result[key] = parseEnum(key, value, rule);
+      continue;
     }
 
     switch (rule) {

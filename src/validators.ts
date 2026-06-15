@@ -18,3 +18,15 @@ export function parseBoolean(key: string, value: string): boolean {
 export function parseString(value: string): string {
   return value;
 }
+
+export function parseEnum(
+  key: string,
+  value: string,
+  allowedValues: readonly string[],
+): string {
+  if (!allowedValues.includes(value)) {
+    throw new Error(`${key} must be one of: ${allowedValues.join(", ")}`);
+  }
+
+  return value;
+}

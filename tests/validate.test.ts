@@ -41,6 +41,26 @@ describe("validateEnv", () => {
       });
     }).toThrow();
   });
+
+  test("validates enum values", () => {
+    process.env.NODE_ENV = "development";
+
+    const env = validateEnv({
+      NODE_ENV: ["development", "production", "test"],
+    });
+
+    expect(env.NODE_ENV).toBe("development");
+  });
+
+  test("throws on invalid enum", () => {
+    process.env.NODE_ENV = "staging";
+
+    expect(() =>
+      validateEnv({
+        NODE_ENV: ["development", "production", "test"],
+      }),
+    ).toThrow("NODE_ENV must be one of");
+  });
 });
 
 beforeEach(() => {
@@ -48,4 +68,5 @@ beforeEach(() => {
   delete process.env.PORT;
   delete process.env.DEBUG;
   delete process.env.MISSING;
+  delete process.env.NODE_ENV;
 });
