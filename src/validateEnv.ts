@@ -1,3 +1,4 @@
+import { EnvValidationError } from "./errors/validationErrors";
 import {
   parseBoolean,
   parseNumber,
@@ -13,6 +14,7 @@ export type Schema = Record<string, PrimitiveType | EnumType>;
 
 export function validateEnv(schema: Schema) {
   const result: Record<string, unknown> = {};
+  const errors: string[] = [];
 
   for (const key in schema) {
     const rule = schema[key];
@@ -20,27 +22,40 @@ export function validateEnv(schema: Schema) {
     const value = process.env[key];
 
     if (value === undefined) {
-      throw new Error(`Missing environment variable: ${key}`);
-    }
-
-    if (Array.isArray(rule)) {
-      result[key] = parseEnum(key, value, rule);
+      errors.push(`Missing environment variable: ${key}`);
       continue;
     }
 
-    switch (rule) {
-      case "string":
-        result[key] = parseString(value);
-        break;
+    try {
+      if (Array.isArray(rule)) {
+        result[key] = parseEnum(key, value, rule);
+        continue;
+      }
 
-      case "number":
-        result[key] = parseNumber(key, value);
-        break;
+      switch (rule) {
+        case "string":
+          result[key] = parseString(value);
+          break;
 
-      case "boolean":
-        result[key] = parseBoolean(key, value);
-        break;
+        case "number":
+          result[key] = parseNumber(key, value);
+          break;
+
+        case "boolean":
+          result[key] = parseBoolean(key, value);
+          break;
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        errors.push(error.message);
+      } else {
+        errors.push(`Unknown validation error for ${key}`);
+      }
     }
+  }
+
+  if (errors.length > 0) {
+    throw new EnvValidationError(errors);
   }
 
   return result;

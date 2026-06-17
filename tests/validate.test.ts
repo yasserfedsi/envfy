@@ -61,6 +61,19 @@ describe("validateEnv", () => {
       }),
     ).toThrow("NODE_ENV must be one of");
   });
+
+  test("collects multiple validation errors", () => {
+    process.env.PORT = "abc";
+    process.env.DEBUG = "yes";
+
+    expect(() =>
+      validateEnv({
+        PORT: "number",
+        DEBUG: "boolean",
+        DATABASE_URL: "string",
+      }),
+    ).toThrowError("Environment validation failed");
+  });
 });
 
 beforeEach(() => {
