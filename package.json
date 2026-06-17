@@ -23,6 +23,11 @@
   ],
   "author": "Yasser Fedsi <fedsi.yasser@gmail.com>",
   "license": "MIT",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "devDependencies": {
     "@types/node": "^25.9.3",
     "tsup": "^8.5.1",
