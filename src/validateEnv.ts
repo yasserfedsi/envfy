@@ -12,10 +12,9 @@ export type EnumType = readonly string[];
 
 export type Schema = Record<string, PrimitiveType | EnumType>;
 
-const errors: string[] = [];
-
 export function validateEnv(schema: Schema) {
   const result: Record<string, unknown> = {};
+  const errors: string[] = [];
 
   for (const key in schema) {
     const rule = schema[key];
@@ -23,7 +22,8 @@ export function validateEnv(schema: Schema) {
     const value = process.env[key];
 
     if (value === undefined) {
-      throw new Error(`Missing environment variable: ${key}`);
+      errors.push(`Missing environment variable: ${key}`);
+      continue;
     }
 
     try {
