@@ -6,11 +6,7 @@ import {
   parseEnum,
 } from "./validators";
 
-export type PrimitiveType = "string" | "number" | "boolean";
-
-export type EnumType = readonly string[];
-
-export type Schema = Record<string, PrimitiveType | EnumType>;
+import type { PrimitiveType, EnumType, Schema } from "./types/index";
 
 export function validateEnv(schema: Schema) {
   const result: Record<string, unknown> = {};
@@ -18,21 +14,40 @@ export function validateEnv(schema: Schema) {
 
   for (const key in schema) {
     const rule = schema[key];
-
     const value = process.env[key];
 
+    const isOptional =
+      !Array.isArray(rule) &&
+      typeof rule === "object" &&
+      "optional" in rule &&
+      rule.optional === true;
+
     if (value === undefined) {
+      if (isOptional) {
+        continue;
+      }
+
       errors.push(`Missing environment variable: ${key}`);
       continue;
     }
 
+    let actualRule: PrimitiveType | EnumType;
+
+    if (Array.isArray(rule)) {
+      actualRule = rule;
+    } else if (typeof rule === "object" && "type" in rule) {
+      actualRule = rule.type;
+    } else {
+      actualRule = rule;
+    }
+
     try {
-      if (Array.isArray(rule)) {
-        result[key] = parseEnum(key, value, rule);
+      if (Array.isArray(actualRule)) {
+        result[key] = parseEnum(key, value, actualRule);
         continue;
       }
 
-      switch (rule) {
+      switch (actualRule) {
         case "string":
           result[key] = parseString(value);
           break;

@@ -74,12 +74,62 @@ describe("validateEnv", () => {
       }),
     ).toThrowError("Environment validation failed");
   });
-});
 
-beforeEach(() => {
-  delete process.env.NAME;
-  delete process.env.PORT;
-  delete process.env.DEBUG;
-  delete process.env.MISSING;
-  delete process.env.NODE_ENV;
+  test("allows missing optional variable", () => {
+    delete process.env.API_KEY;
+
+    expect(() =>
+      validateEnv({
+        API_KEY: {
+          type: "string",
+          optional: true,
+        },
+      }),
+    ).not.toThrow();
+  });
+
+  test("validates optional variable when present", () => {
+    process.env.API_KEY = "secret";
+
+    const env = validateEnv({
+      API_KEY: {
+        type: "string",
+        optional: true,
+      },
+    });
+
+    expect(env.API_KEY).toBe("secret");
+  });
+
+  test("throws when optional variable has an invalid value", () => {
+    process.env.PORT = "abc";
+
+    expect(() =>
+      validateEnv({
+        PORT: {
+          type: "number",
+          optional: true,
+        },
+      }),
+    ).toThrow("PORT must be a valid number");
+  });
+
+  test("still throws for required variable", () => {
+    delete process.env.API_KEY;
+
+    expect(() =>
+      validateEnv({
+        API_KEY: "string",
+      }),
+    ).toThrow();
+  });
+
+  beforeEach(() => {
+    delete process.env.NAME;
+    delete process.env.PORT;
+    delete process.env.DEBUG;
+    delete process.env.MISSING;
+    delete process.env.NODE_ENV;
+    delete process.env.API_KEY;
+  });
 });
