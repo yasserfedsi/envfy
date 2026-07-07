@@ -1,4 +1,5 @@
 import { EnvValidationError } from "./errors/validationErrors";
+import { EnvSchemaError } from "./errors/schemaError";
 import {
   parseBoolean,
   parseNumber,
@@ -14,31 +15,50 @@ export function validateEnv(schema: Schema) {
 
   for (const key in schema) {
     const rule = schema[key];
-    const value = process.env[key];
+    let value = process.env[key];
 
+    const isOptionalObject = !Array.isArray(rule) && typeof rule === "object";
     const isOptional =
-      !Array.isArray(rule) &&
-      typeof rule === "object" &&
+      isOptionalObject && "optional" in rule && rule.optional === true;
+
+    // if (isOptionalObject && rule.optional && rule.default !== undefined) {
+    //   throw new EnvSchemaError(
+    //     `${key} cannot have both "optional" and "default". Choose one. `,
+    //   );
+    // }
+
+    if (
+      isOptionalObject &&
       "optional" in rule &&
-      rule.optional === true;
+      rule.optional &&
+      rule.default !== undefined
+    ) {
+      throw new EnvSchemaError(
+        `${key} cannot have both "optional" and "default". Choose one. `,
+      );
+    }
+
+    if (
+      value === undefined &&
+      isOptionalObject &&
+      "default" in rule &&
+      rule.default !== undefined
+    ) {
+      value = String(rule.default);
+    }
 
     if (value === undefined) {
       if (isOptional) {
         continue;
       }
-
       errors.push(`Missing environment variable: ${key}`);
       continue;
     }
 
-    let actualRule: PrimitiveType | EnumType;
+    let actualRule = rule as PrimitiveType | EnumType;
 
-    if (Array.isArray(rule)) {
-      actualRule = rule;
-    } else if (typeof rule === "object" && "type" in rule) {
+    if (isOptionalObject && "type" in rule) {
       actualRule = rule.type;
-    } else {
-      actualRule = rule;
     }
 
     try {
