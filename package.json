@@ -1,6 +1,6 @@
 {
   "name": "@yasserfedsi/envfy",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "A simple, type-safe environment variable validator for Node.js applications",
   "type": "module",
   "main": "./dist/index.cjs",
