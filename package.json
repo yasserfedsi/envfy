@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yasserfedsi/envfy"
+    "url": "https://github.com/envfyjs/envfy"
   },
   "keywords": [
     "env",
@@ -28,7 +28,7 @@
   "author": "Yasser Fedsi <fedsi.yasser@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "httpS://github.com/yasserfedsi/envfy/issues",
+    "url": "httpS://github.com/envfyjs/envfy/issues",
     "email": "fedsi.yasser@gmail.com"
   },
   "homepage": "https://envfy.yasserfedsi.dev/",
