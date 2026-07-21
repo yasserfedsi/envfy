@@ -9,7 +9,9 @@ import {
 
 import type { PrimitiveType, EnumType, Schema } from "./types/index";
 
-export function validateEnv(schema: Schema) {
+import type { InferSchema } from "./types/index";
+
+export function validateEnv<T extends Schema>(schema: T): InferSchema<T> {
   const result: Record<string, unknown> = {};
   const errors: string[] = [];
 
@@ -93,5 +95,5 @@ export function validateEnv(schema: Schema) {
     throw new EnvValidationError(errors);
   }
 
-  return result;
+  return result as InferSchema<T>;
 }
