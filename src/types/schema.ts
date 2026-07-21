@@ -1,6 +1,6 @@
 export type PrimitiveType = "string" | "number" | "boolean";
 
-export type EnumType = readonly string[];
+export type EnumType = readonly [string, ...string[]];
 
 export interface EnvOption {
   type: PrimitiveType;

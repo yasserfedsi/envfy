@@ -14,7 +14,7 @@ export type InferPrimitive<T extends PrimitiveType> = T extends "string"
 /**
  * Infer enum types
  *  */
-export type InferEnum<T extends EnumType> = T[number];
+export type InferEnum<T extends readonly string[]> = T[number];
 
 /**
  * Infer object schema
@@ -26,7 +26,7 @@ export type InferOption<T extends EnvOption> = InferPrimitive<T["type"]>;
  */
 export type InferSchemaValue<T> = T extends PrimitiveType
   ? InferPrimitive<T>
-  : T extends EnumType
+  : T extends readonly string[]
     ? InferEnum<T>
     : T extends EnvOption
       ? InferOption<T>
